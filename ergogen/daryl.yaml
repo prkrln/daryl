@@ -1,0 +1,143 @@
+units:
+  # Proxy Spacing Variables
+  kx: cx
+  ky: cy
+  # Padding Variables
+  px: kx + 2
+  py: ky + 2
+  $default_width: cx
+  $default_height: cy
+
+points:
+  zones:
+    matrix:
+      anchor:
+        shift: [100, -50]
+      key:
+        padding: 1ky
+        spread: 1kx
+      columns:
+        pinky:
+          key:
+            column_net: P1
+            mirror.column_net: P21
+        ring:
+          key:
+            stagger: 1ky
+            column_net: P0
+            mirror.column_net: P20
+        middle:
+          key:
+            stagger: 0.3ky
+            column_net: P2
+            mirror.column_net: P19
+        index:
+          key:
+            stagger: -0.3ky
+            column_net: P3
+            mirror.column_net: P18
+        inner:
+          key:
+            stagger: -0.2ky
+            column_net: P4
+            mirror.column_net: P15
+      rows:
+        bottom:
+          key:
+          row_net: P8
+        home:
+          key:
+          row_net: P7
+        top:
+          key:
+          row_net: P6
+    thumb:
+      key:
+        padding: 1ky
+        spread: 1kx
+      columns:
+        column:
+          key:
+            column_net: P4
+            mirror.column_net: P15
+      rows:
+        row:
+          row_net: P9
+      anchor:
+        ref: matrix_inner_bottom
+        shift: [0.5kx, -ky]
+  rotate: -25
+  mirror: &mirror
+    ref: matrix_inner_top
+    distance: 2.5kx
+outlines:
+  raw:
+    - what: rectangle
+      where: true
+      size: [px, py]
+  keys:
+    - what: rectangle
+      where: true
+      size: [kx-0.5,ky-0.5]
+  extension:
+    - what: polygon
+      operation: stack
+      points:
+        - ref: thumb_column_row
+          shift: [0.5px, -0.5py]
+        - ref: mirror_thumb_column_row
+          shift: [0.5px, -0.5py]
+        - ref: mirror_matrix_inner_top
+          shift: [-px, 0.5py]
+        - ref: mirror_matrix_inner_top
+          shift: [0.5px, 0.5py]
+        - ref: matrix_inner_top
+          shift: [0.5px, 0.5py]
+        - ref: matrix_inner_top
+          shift: [-px, 0.5py]
+  board:
+    - name: raw
+    - operation: add
+      name: extension
+      fillet: 1
+  combo:
+    - name: board
+    - operation: subtract
+      name: keys
+pcbs:
+  keyboard:
+    template: kicad8
+    outlines:
+      main:
+        outline: board
+    footprints:
+      choc:
+        what: ceoloide/switch_choc_v1_v2
+        where: true
+        params:
+          include_corner_marks: true
+          include_keycap: true
+          keycap_height: 16.5
+          keycap_width: 17.5
+          reversible: false
+          solder: true
+          hotswap: false
+          choc_v2_support: false
+          outer_pad_width_front: 2.0
+          outer_pad_width_back: 2.0
+          from: "{{column_net}}"
+          to: "{{colrow}}"
+      diode:
+        what: ceoloide/diode_tht_sod123
+        where: true
+        params:
+          from: "{{colrow}}"
+          to: "{{row_net}}"
+        adjust:
+          shift: [0, -5]
+      promicro:
+        what: ceoloide/mcu_nice_nano
+        params:
+        where:
+          ref.aggregate.parts: [matrix_inner_home, mirror_matrix_inner_home]
+          shift: [0,3]
