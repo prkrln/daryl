@@ -3,4 +3,4 @@
 Portable 32 key unibody. My mom named it Daryl <3.
 
 Firmware:
-https://github.com/Hippo5412/qmk_firmware
+https://github.com/prkrln/qmk_firmware
